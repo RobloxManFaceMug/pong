@@ -16,6 +16,7 @@ class Ball {
         void DrawBall();
         void UpdateBall();
         void Reset();
+        // void DrawOver();
 };
 
 class Paddle {

@@ -35,6 +35,10 @@ void Ball::Reset(){
     vel_y *= direction_choice[GetRandomValue(0,1)];
 }
 
+// void Ball::DrawOver(){
+//     DrawCircle(x_pos, y_pos, radius, BLACK);
+// }
+
 
 // Paddle class
 void Paddle::DrawPaddle() {

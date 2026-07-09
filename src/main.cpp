@@ -1,8 +1,12 @@
+#define RAYGUI_IMPLEMENTATION
+
 #include "objects.h"
 
 Ball ball;
 Paddle Player1;
 Cpu CPU;
+
+int PointsToWin = 1;
 
 int main(void)
 {
@@ -35,8 +39,9 @@ int main(void)
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
+
         BeginDrawing();
-        
+
         // Updating the objects
         ball.UpdateBall();
         Player1.UpdatePaddle();
@@ -44,15 +49,46 @@ int main(void)
 
         // Collision
         if(CheckCollisionCircleRec(Vector2{ball.x_pos, ball.y_pos}, ball.radius, Rectangle{Player1.x_pos, Player1.y_pos, Player1.width, Player1.height})) {
-            ball.vel_x *= -1;
+            ball.vel_x = (ball.vel_x + 1)*-1;
+            if (ball.vel_y > 0) {
+                ball.vel_y += 1;
+            }
+            else {
+                ball.vel_y -= 1;
+            }
         }
 
         if(CheckCollisionCircleRec(Vector2{ball.x_pos, ball.y_pos}, ball.radius, Rectangle{CPU.x_pos, CPU.y_pos, CPU.width, CPU.height})) {
-            ball.vel_x *= -1;
+            ball.vel_x = (ball.vel_x + 1)*-1;
+            if (ball.vel_y > 0) {
+                ball.vel_y += 1;
+            }
+            else {
+                ball.vel_y -= 1;
+            }
         }
 
         // Pretending we have actual movement
         ClearBackground(BLACK);
+
+        // win condition
+        if (P1Score >= PointsToWin) 
+        {
+            ball.vel_x = 0;
+            ball.vel_y = 0;
+            Player1.speed = 0;
+            CPU.speed = 0;
+            DrawText("P1 WINS", screenWidth/2 - 150*2, screenHeight/2 - 60, 150, WHITE);
+        }
+
+        if (P2Score >= PointsToWin) 
+        {   
+            ball.vel_x = 0;
+            ball.vel_y = 0;
+            Player1.speed = 0;
+            CPU.speed = 0;
+            DrawText("P2 WINS", screenWidth/2 - 150*2, screenHeight/2 - 60, 150, WHITE);
+        }
 
         // Drawing shapes
         ball.DrawBall();
@@ -63,6 +99,7 @@ int main(void)
         DrawText(TextFormat("%i", P1Score), 3*screenWidth/4 - 20, 20, 80, WHITE);
 
         EndDrawing();
+
     }
 
     // De-Initialization
