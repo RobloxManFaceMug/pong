@@ -1,3 +1,6 @@
 Attempt to add main menu
+	added point to win setting
+	added starting velocity setting
 
 fixed ball keeping momentum after scoring a point
+fixed ball direction not being random in the first round
