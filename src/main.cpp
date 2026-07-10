@@ -1,15 +1,79 @@
-#define RAYGUI_IMPLEMENTATION
-
 #include "objects.h"
+
+// TODO: add a variable that stores mouse position
+// then when mouse is clicked check if it is in the
+// box coordinates, only then change box's state
 
 Ball ball;
 Paddle Player1;
 Cpu CPU;
 
-int PointsToWin = 1;
+// Modifiable variables
+int PointsToWin = 3;
+int StartingVelocity = 5;
+int Difficulty = 0;     // 0 - 2P, 1 - easy, 2 - normal, 3 - hard
+
+int MainMenu() {
+
+    Vector2 MousePos;
+
+    while (!IsKeyDown(KEY_ENTER)) {
+        BeginDrawing();
+    
+        // Text
+        DrawText("pong but awesome", 190, 100, 100, WHITE);
+        DrawText("press ENTER to start", GetScreenWidth()/2-140, GetScreenHeight()-100, 25, WHITE);
+
+        // Points to win box
+        DrawText("Points to win", 210, 290, 40, WHITE);
+        DrawRectangle(210, 350, 200, 75, WHITE);
+        DrawText(TextFormat("%i", PointsToWin), 290, 352, 80, BLACK);
+
+        // Starting velocity box
+        DrawText("Starting velocity", 870, 290, 40,  WHITE);
+        DrawRectangle(870, 350, 200, 75, WHITE);
+        DrawText(TextFormat("%i", StartingVelocity), 960, 352, 80, BLACK);
+
+        // Difficulty box
+        DrawText("CPU difficulty", 500, 440, 40, WHITE);
+        DrawRectangle(210, 500, 200, 75, WHITE);
+        DrawRectangle(430, 500, 200, 75, WHITE);
+        DrawRectangle(650, 500, 200, 75, WHITE);
+        DrawRectangle(870, 500, 200, 75, WHITE);
+        
+        // check for clicks
+        MousePos = GetMousePosition();
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            
+            // Points to win
+            if (CheckCollisionPointRec(MousePos, {210, 350, 200, 75})) {
+                if (PointsToWin >= 9) {
+                    PointsToWin = 1;
+                }
+                else {
+                    PointsToWin++;
+                }
+            }
+
+            // Starting velocity
+            else if (CheckCollisionPointRec(MousePos, {870, 350, 200, 75})) {
+                if (StartingVelocity >= 20) {
+                    StartingVelocity = 3;
+                }
+                else {
+                    StartingVelocity++;
+                }
+            }
+        }
+
+        EndDrawing();
+    }
+    return 1;
+}
 
 int main(void)
 {
+
     // Initialization
     const int screenWidth = 1280;
     const int screenHeight = 720;
@@ -18,11 +82,14 @@ int main(void)
 
     SetTargetFPS(60);
 
+    // Main menu, duh
+    MainMenu();
+
+    // Objects initialization
     ball.x_pos = screenWidth/2;
     ball.y_pos = screenHeight/2;
     ball.radius = 20;
-    ball.vel_x = 5;
-    ball.vel_y = 5;
+    ball.ResetVel = StartingVelocity;
 
     Player1.x_pos = 70;
     Player1.y_pos = GetScreenHeight()/2 - 60;
@@ -35,6 +102,8 @@ int main(void)
     CPU.width = 25;
     CPU.height = 120;
     CPU.speed = 12;
+
+    ball.Reset();
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -95,8 +164,8 @@ int main(void)
         Player1.DrawPaddle();
         CPU.DrawPaddle();
         DrawLine(screenWidth/2, 0, screenWidth/2, screenHeight, WHITE);
-        DrawText(TextFormat("%i", P2Score), screenWidth/4 - 20, 20, 80, WHITE);
-        DrawText(TextFormat("%i", P1Score), 3*screenWidth/4 - 20, 20, 80, WHITE);
+        DrawText(TextFormat("%i", P1Score), screenWidth/4 - 20, 20, 80, WHITE);
+        DrawText(TextFormat("%i", P2Score), 3*screenWidth/4 - 20, 20, 80, WHITE);
 
         EndDrawing();
 

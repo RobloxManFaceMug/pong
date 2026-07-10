@@ -16,13 +16,13 @@ void Ball::UpdateBall() {
         vel_y *= -1;
     }
     if (x_pos + radius >= GetScreenWidth()) {
-        Reset();
         P1Score++;
+        Reset();
     }
         
     if (x_pos - radius <= 0) {
-        Reset();
         P2Score++;
+        Reset();
     }
 }
 
@@ -30,6 +30,8 @@ void Ball::Reset(){
     x_pos = GetScreenWidth()/2;
     y_pos = GetScreenHeight()/2;
 
+    vel_x = ResetVel;
+    vel_y = ResetVel;
     int direction_choice[2] = {-1, 1};
     vel_x *= direction_choice[GetRandomValue(0,1)];
     vel_y *= direction_choice[GetRandomValue(0,1)];

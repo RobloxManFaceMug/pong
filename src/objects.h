@@ -12,6 +12,7 @@ class Ball {
         float x_pos, y_pos;
         int radius;
         int vel_x, vel_y;
+        int ResetVel;
 
         void DrawBall();
         void UpdateBall();

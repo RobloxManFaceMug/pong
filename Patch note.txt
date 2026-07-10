@@ -1,0 +1,3 @@
+Attempt to add main menu
+
+fixed ball keeping momentum after scoring a point
