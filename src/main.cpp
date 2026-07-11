@@ -1,8 +1,6 @@
 #include "objects.h"
-
-// TODO: add a variable that stores mouse position
-// then when mouse is clicked check if it is in the
-// box coordinates, only then change box's state
+#include "menu.h"
+#include <time.h>
 
 Ball ball;
 Paddle Player1;
@@ -17,9 +15,24 @@ int MainMenu() {
 
     Vector2 MousePos;
 
+    InitAudioDevice();
+    Music music = LoadMusicStream("resources/music/stealth.mp3");
+    PlayMusicStream(music);
+
+    bool pause = false;             // Music playing paused
+
+    float pan = 0.0f;               // Default audio pan center [-1.0f..1.0f]
+    SetMusicPan(music, pan);
+
+    float volume = 1.0f;            // Default audio volume [0.0f..1.0f]
+    SetMusicVolume(music, volume);
+
+
     while (!IsKeyDown(KEY_ENTER)) {
         BeginDrawing();
-    
+        
+        UpdateMusicStream(music);
+
         // Text
         DrawText("pong but awesome", 190, 100, 100, WHITE);
         DrawText("press ENTER to start", GetScreenWidth()/2-140, GetScreenHeight()-100, 25, WHITE);
@@ -37,9 +50,13 @@ int MainMenu() {
         // Difficulty box
         DrawText("CPU difficulty", 500, 440, 40, WHITE);
         DrawRectangle(210, 500, 200, 75, WHITE);
+        DrawText("DUEL", 260, 518, 40, BLACK);
         DrawRectangle(430, 500, 200, 75, WHITE);
+        DrawText("EASY", 475, 518, 40, BLACK);
         DrawRectangle(650, 500, 200, 75, WHITE);
+        DrawText("NORMAL", 670, 518, 40, BLACK);
         DrawRectangle(870, 500, 200, 75, WHITE);
+        DrawText("HARD", 915, 518, 40, BLACK);
         
         // check for clicks
         MousePos = GetMousePosition();
@@ -64,11 +81,48 @@ int MainMenu() {
                     StartingVelocity++;
                 }
             }
+
+            // 2 player mode
+            else if (CheckCollisionPointRec(MousePos, {210, 500, 200, 75})) {
+                Difficulty = 0;
+            }
+
+            // easy mode
+            else if (CheckCollisionPointRec(MousePos, {430, 500, 200, 75})) {
+                Difficulty = 1;
+            }
+
+            // normal mode
+            else if (CheckCollisionPointRec(MousePos, {650, 500, 200, 75})) {
+                Difficulty = 2;
+            }
+
+            // hard mode
+            else if (CheckCollisionPointRec(MousePos, {870, 500, 200, 75})) {
+                Difficulty = 3;
+            }
         }
 
         EndDrawing();
     }
-    return 1;
+    UnloadMusicStream(music);
+    CloseAudioDevice();
+
+    WaitTime(0.25);
+
+    // BeginDrawing();
+    // ClearBackground(BLACK);
+    // DrawText("3", GetScreenWidth()/2, GetScreenHeight()/2, 50, WHITE);
+    // WaitTime(1);
+    // DrawText("2", GetScreenWidth()/2, GetScreenHeight()/2, 50, WHITE);
+    // WaitTime(1);
+    // DrawText("1", GetScreenWidth()/2, GetScreenHeight()/2, 50, WHITE);
+    // WaitTime(1);
+    // DrawText("GO", GetScreenWidth()/2, GetScreenHeight()/2, 50, WHITE);
+    // WaitTime(1);
+    // EndDrawing();
+
+    return 0;
 }
 
 int main(void)
@@ -84,6 +138,26 @@ int main(void)
 
     // Main menu, duh
     MainMenu();
+
+    // Initialize music
+    InitAudioDevice();
+    Music music;
+    switch (Difficulty) {
+        case 0:
+            music = LoadMusicStream("resources/music/Violet Tactics.mp3");
+            break;
+        default:
+            music = LoadMusicStream("resources/music/Catswing.mp3");
+    }
+    PlayMusicStream(music);
+
+    bool pause = false;             // Music playing paused
+
+    float pan = 0.0f;               // Default audio pan center [-1.0f..1.0f]
+    SetMusicPan(music, pan);
+
+    float volume = 1.0f;            // Default audio volume [0.0f..1.0f]
+    SetMusicVolume(music, volume);
 
     // Objects initialization
     ball.x_pos = screenWidth/2;
@@ -114,7 +188,24 @@ int main(void)
         // Updating the objects
         ball.UpdateBall();
         Player1.UpdatePaddle();
-        CPU.UpdateCPU(ball.y_pos);
+    
+        UpdateMusicStream(music);
+
+        // Update CPU based on difficulty
+        switch (Difficulty) {
+            case 0:
+                CPU.UpdatePlayer2();
+                break;
+            case 1:
+                CPU.UpdateCPUEasy(ball.y_pos, ball.x_pos);
+                break;
+            case 2:
+                CPU.UpdateCPUNormal(ball.y_pos, ball.x_pos);
+                break;
+            case 3:
+                CPU.UpdateCPUHard(ball.y_pos);
+                break;
+        }
 
         // Collision
         if(CheckCollisionCircleRec(Vector2{ball.x_pos, ball.y_pos}, ball.radius, Rectangle{Player1.x_pos, Player1.y_pos, Player1.width, Player1.height})) {
@@ -172,6 +263,8 @@ int main(void)
     }
 
     // De-Initialization
+    UnloadMusicStream(music);
+    CloseAudioDevice();
     CloseWindow();
 
     return 0;

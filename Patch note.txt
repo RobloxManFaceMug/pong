@@ -1,6 +1,8 @@
-Attempt to add main menu
-	added point to win setting
-	added starting velocity setting
+Added SFX and music files (SFX currently unused)
+Added music
 
-fixed ball keeping momentum after scoring a point
-fixed ball direction not being random in the first round
+finished main menu
+	added duel mode (2 players)
+	added CPU difficulty settings
+
+fixed players scores switching places

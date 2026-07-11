@@ -34,8 +34,14 @@ class Paddle {
 };
 
 class Cpu: public Paddle {
-    public: 
-        void UpdateCPU(int ball_y_pos);
+    private:
+        int diff;
+    public:
+        void UpdatePlayer2();
+        void UpdateCPUEasy(int ball_y_pos, int ball_x_pos);
+        void UpdateCPUNormal(int ball_y_pos, int ball_x_pos);
+        void UpdateCPUHard(int ball_y_pos);
+        void SetDiff(int diff);
 };
 
 

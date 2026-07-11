@@ -68,9 +68,46 @@ void Paddle::StayInBounds() {
     }
 }
 
+// Ask about many-year onions
+// Ask about number of eye clinic
 
 // Cpu class
-void Cpu::UpdateCPU(int ball_y_pos) {
+
+// Easy - tracks right half, entire paddle
+// Medium - tracks 3/4 of the field, most of the paddle
+// Hard - full tracking, only center
+void Cpu::UpdatePlayer2() {
+    if (IsKeyDown(KEY_LEFT)) {
+        y_pos -= speed;
+    }
+    if (IsKeyDown(KEY_RIGHT)) {
+        y_pos += speed;
+    }
+    StayInBounds();
+}
+void Cpu::UpdateCPUEasy(int ball_y_pos, int ball_x_pos) {
+    if (y_pos > ball_y_pos && ball_x_pos >= GetScreenWidth()/2)
+    {
+        y_pos -= speed;
+    }
+    if (y_pos + height < ball_y_pos && ball_x_pos >= GetScreenWidth()/2)
+    {
+        y_pos += speed;
+    }
+    StayInBounds();
+}
+void Cpu::UpdateCPUNormal(int ball_y_pos, int ball_x_pos) {
+     if (y_pos + height/4 > ball_y_pos && ball_x_pos >= GetScreenWidth()/4)
+    {
+        y_pos -= speed;
+    }
+    if (y_pos + height/4*3 < ball_y_pos && ball_x_pos >= GetScreenWidth()/4)
+    {
+        y_pos += speed;
+    }
+    StayInBounds();
+}
+void Cpu::UpdateCPUHard(int ball_y_pos) {
     if (y_pos + height/2 > ball_y_pos)
     {
         y_pos -= speed;
