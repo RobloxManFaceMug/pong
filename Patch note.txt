@@ -1,8 +1,0 @@
-Added SFX and music files (SFX currently unused)
-Added music
-
-finished main menu
-	added duel mode (2 players)
-	added CPU difficulty settings
-
-fixed players scores switching places

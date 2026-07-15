@@ -15,7 +15,7 @@ class Ball {
         int ResetVel;
 
         void DrawBall();
-        void UpdateBall();
+        void UpdateBall(Sound Score);
         void Reset();
         // void DrawOver();
 };

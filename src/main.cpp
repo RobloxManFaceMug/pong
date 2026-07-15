@@ -9,30 +9,35 @@ Cpu CPU;
 // Modifiable variables
 int PointsToWin = 3;
 int StartingVelocity = 5;
-int Difficulty = 0;     // 0 - 2P, 1 - easy, 2 - normal, 3 - hard
+int Difficulty = 2;     // 0 - 2P, 1 - easy, 2 - normal, 3 - hard
+int GameIsOver = 0;
+int LongTimeCheckerFirstTimePlayer = 1;
+int VariableThatIsUsedWhenYouTakeTooLong = 0;
+float MasterVolume = 0.4f;
 
 int MainMenu() {
 
     Vector2 MousePos;
 
     InitAudioDevice();
+    SetMasterVolume(MasterVolume);
+
+    Sound snd_select = LoadSound("resources/SFX/snd_select.wav");
+    // Sound snd_get_ready = LoadSound("resources/SFX/snd_get_ready.mp3");
+    // Sound snd_game_start = LoadSound("resources/SFX/snd_game_start.wav");
+
     Music music = LoadMusicStream("resources/music/stealth.mp3");
+
     PlayMusicStream(music);
 
-    bool pause = false;             // Music playing paused
-
-    float pan = 0.0f;               // Default audio pan center [-1.0f..1.0f]
-    SetMusicPan(music, pan);
-
-    float volume = 1.0f;            // Default audio volume [0.0f..1.0f]
-    SetMusicVolume(music, volume);
+    SetMusicVolume(music, 1.0f);      // Default audio volume [0.0f..1.0f]
 
 
     while (!IsKeyDown(KEY_ENTER)) {
         BeginDrawing();
         
         UpdateMusicStream(music);
-
+        
         // Text
         DrawText("pong but awesome", 190, 100, 100, WHITE);
         DrawText("press ENTER to start", GetScreenWidth()/2-140, GetScreenHeight()-100, 25, WHITE);
@@ -61,9 +66,9 @@ int MainMenu() {
         // check for clicks
         MousePos = GetMousePosition();
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            
             // Points to win
             if (CheckCollisionPointRec(MousePos, {210, 350, 200, 75})) {
+                PlaySound(snd_select);
                 if (PointsToWin >= 9) {
                     PointsToWin = 1;
                 }
@@ -74,6 +79,7 @@ int MainMenu() {
 
             // Starting velocity
             else if (CheckCollisionPointRec(MousePos, {870, 350, 200, 75})) {
+                PlaySound(snd_select);
                 if (StartingVelocity >= 20) {
                     StartingVelocity = 3;
                 }
@@ -85,27 +91,32 @@ int MainMenu() {
             // 2 player mode
             else if (CheckCollisionPointRec(MousePos, {210, 500, 200, 75})) {
                 Difficulty = 0;
+                PlaySound(snd_select);
             }
 
             // easy mode
             else if (CheckCollisionPointRec(MousePos, {430, 500, 200, 75})) {
                 Difficulty = 1;
+                PlaySound(snd_select);
             }
 
             // normal mode
             else if (CheckCollisionPointRec(MousePos, {650, 500, 200, 75})) {
                 Difficulty = 2;
+                PlaySound(snd_select);
             }
 
             // hard mode
             else if (CheckCollisionPointRec(MousePos, {870, 500, 200, 75})) {
                 Difficulty = 3;
+                PlaySound(snd_select);
             }
         }
 
         EndDrawing();
     }
     UnloadMusicStream(music);
+    UnloadSound(snd_select);
     CloseAudioDevice();
 
     WaitTime(0.25);
@@ -141,7 +152,16 @@ int main(void)
 
     // Initialize music
     InitAudioDevice();
+    SetMasterVolume(MasterVolume);
+    Sound snd_paddle_bump = LoadSound("resources/SFX/snd_paddle_bump.wav");
+    Sound snd_score = LoadSound("resources/SFX/snd_score.wav");
+    Sound snd_victory = LoadSound("resources/SFX/snd_victory.mp3");
+    Sound snd_defeat = LoadSound("resources/SFX/snd_defeat.mp3");
+    Sound snd_win_duel = LoadSound("resources/SFX/snd_win_duel.mp3");
+    Sound snd_yourtakingtoolong = LoadSound("resources/SFX/snd_yourtakingtoolong.mp3");
+    Sound snd_too_fast = LoadSound("resources/SFX/snd_too_fast.mp3");
     Music music;
+
     switch (Difficulty) {
         case 0:
             music = LoadMusicStream("resources/music/Violet Tactics.mp3");
@@ -150,14 +170,6 @@ int main(void)
             music = LoadMusicStream("resources/music/Catswing.mp3");
     }
     PlayMusicStream(music);
-
-    bool pause = false;             // Music playing paused
-
-    float pan = 0.0f;               // Default audio pan center [-1.0f..1.0f]
-    SetMusicPan(music, pan);
-
-    float volume = 1.0f;            // Default audio volume [0.0f..1.0f]
-    SetMusicVolume(music, volume);
 
     // Objects initialization
     ball.x_pos = screenWidth/2;
@@ -186,7 +198,7 @@ int main(void)
         BeginDrawing();
 
         // Updating the objects
-        ball.UpdateBall();
+        ball.UpdateBall(snd_score);
         Player1.UpdatePaddle();
     
         UpdateMusicStream(music);
@@ -216,6 +228,10 @@ int main(void)
             else {
                 ball.vel_y -= 1;
             }
+            if (((abs(ball.vel_y) == 10 && StartingVelocity < 8) || (abs(ball.vel_y) == 15 && StartingVelocity < 13 && StartingVelocity >= 8))) {
+                PlaySound(snd_too_fast);
+            }
+            PlaySound(snd_paddle_bump);
         }
 
         if(CheckCollisionCircleRec(Vector2{ball.x_pos, ball.y_pos}, ball.radius, Rectangle{CPU.x_pos, CPU.y_pos, CPU.width, CPU.height})) {
@@ -226,6 +242,10 @@ int main(void)
             else {
                 ball.vel_y -= 1;
             }
+            if (((abs(ball.vel_y) == 10 && StartingVelocity < 8) || (abs(ball.vel_y) == 15 && StartingVelocity < 13 && StartingVelocity >= 8))) {
+                PlaySound(snd_too_fast);
+            }
+            PlaySound(snd_paddle_bump);
         }
 
         // Pretending we have actual movement
@@ -233,25 +253,63 @@ int main(void)
 
         // win condition
         if (P1Score >= PointsToWin) 
-        {
+        {   
+            GameIsOver = 1;
             ball.vel_x = 0;
             ball.vel_y = 0;
             Player1.speed = 0;
             CPU.speed = 0;
             DrawText("P1 WINS", screenWidth/2 - 150*2, screenHeight/2 - 60, 150, WHITE);
+            if (LongTimeCheckerFirstTimePlayer) {
+                // game over SFX based on difficulty
+                switch (Difficulty) {
+                    case 0:
+                        PauseMusicStream(music);
+                        PlaySound(snd_win_duel);
+                        LongTimeCheckerFirstTimePlayer = 0;
+                        break;
+                    default:
+                        PauseMusicStream(music);
+                        PlaySound(snd_victory);
+                        LongTimeCheckerFirstTimePlayer = 0;
+                }
+            }
+            // else if (GameIsOver && !LongTimeCheckerFirstTimePlayer) {
+            //     VariableThatIsUsedWhenYouTakeTooLong++;
+            //     if (VariableThatIsUsedWhenYouTakeTooLong > 600){
+            //         PlaySound(snd_yourtakingtoolong);
+            //     }
+            // }
         }
 
         if (P2Score >= PointsToWin) 
         {   
+            GameIsOver = 1;
             ball.vel_x = 0;
             ball.vel_y = 0;
             Player1.speed = 0;
             CPU.speed = 0;
             DrawText("P2 WINS", screenWidth/2 - 150*2, screenHeight/2 - 60, 150, WHITE);
+            if (LongTimeCheckerFirstTimePlayer) {
+                // game over SFX based on difficulty
+                switch (Difficulty) {
+                    case 0:
+                        PauseMusicStream(music);
+                        PlaySound(snd_win_duel);
+                        LongTimeCheckerFirstTimePlayer = 0;
+                        break;
+                    default:
+                        PauseMusicStream(music);
+                        PlaySound(snd_defeat);
+                        LongTimeCheckerFirstTimePlayer = 0;
+                }
+            }
         }
 
         // Drawing shapes
-        ball.DrawBall();
+        if (!GameIsOver) {
+            ball.DrawBall();
+        }
         Player1.DrawPaddle();
         CPU.DrawPaddle();
         DrawLine(screenWidth/2, 0, screenWidth/2, screenHeight, WHITE);
@@ -263,7 +321,13 @@ int main(void)
     }
 
     // De-Initialization
-    UnloadMusicStream(music);
+    UnloadSound(snd_defeat);
+    UnloadSound(snd_paddle_bump);
+    UnloadSound(snd_score);
+    UnloadSound(snd_victory);
+    UnloadSound(snd_yourtakingtoolong);
+    UnloadSound(snd_too_fast);
+    UnloadSound(snd_win_duel);
     CloseAudioDevice();
     CloseWindow();
 

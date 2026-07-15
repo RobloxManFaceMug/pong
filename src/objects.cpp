@@ -8,7 +8,7 @@ void Ball::DrawBall() {
     DrawCircle(x_pos, y_pos, radius, WHITE);
 }
 
-void Ball::UpdateBall() {
+void Ball::UpdateBall(Sound Score) {
     x_pos += vel_x;
     y_pos += vel_y;
 
@@ -17,16 +17,18 @@ void Ball::UpdateBall() {
     }
     if (x_pos + radius >= GetScreenWidth()) {
         P1Score++;
+        PlaySound(Score);
         Reset();
     }
         
     if (x_pos - radius <= 0) {
         P2Score++;
+        PlaySound(Score);
         Reset();
     }
 }
 
-void Ball::Reset(){
+void Ball::Reset() {
     x_pos = GetScreenWidth()/2;
     y_pos = GetScreenHeight()/2;
 
@@ -67,9 +69,6 @@ void Paddle::StayInBounds() {
         y_pos = 0;
     }
 }
-
-// Ask about many-year onions
-// Ask about number of eye clinic
 
 // Cpu class
 
