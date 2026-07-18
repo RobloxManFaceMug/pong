@@ -220,7 +220,7 @@ int main(void)
         }
 
         // Collision
-        if(CheckCollisionCircleRec(Vector2{ball.x_pos, ball.y_pos}, ball.radius, Rectangle{Player1.x_pos, Player1.y_pos, Player1.width, Player1.height})) {
+        if(CheckCollisionCircleRec(Vector2{ball.x_pos, ball.y_pos}, ball.radius, Rectangle{(Player1.x_pos + Player1.width - 1), Player1.y_pos, 1, Player1.height})) {
             ball.vel_x = (ball.vel_x + 1)*-1;
             if (ball.vel_y > 0) {
                 ball.vel_y += 1;
@@ -234,7 +234,7 @@ int main(void)
             PlaySound(snd_paddle_bump);
         }
 
-        if(CheckCollisionCircleRec(Vector2{ball.x_pos, ball.y_pos}, ball.radius, Rectangle{CPU.x_pos, CPU.y_pos, CPU.width, CPU.height})) {
+        if(CheckCollisionCircleRec(Vector2{ball.x_pos, ball.y_pos}, ball.radius, Rectangle{CPU.x_pos, CPU.y_pos, 1, CPU.height})) {
             ball.vel_x = (ball.vel_x + 1)*-1;
             if (ball.vel_y > 0) {
                 ball.vel_y += 1;
@@ -311,6 +311,7 @@ int main(void)
             ball.DrawBall();
         }
         Player1.DrawPaddle();
+        // Player1.DrawHitbox();
         CPU.DrawPaddle();
         DrawLine(screenWidth/2, 0, screenWidth/2, screenHeight, WHITE);
         DrawText(TextFormat("%i", P1Score), screenWidth/4 - 20, 20, 80, WHITE);

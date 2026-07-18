@@ -46,8 +46,12 @@ void Ball::Reset() {
 
 // Paddle class
 void Paddle::DrawPaddle() {
-        DrawRectangle(x_pos, y_pos, width, height, WHITE);
+    DrawRectangle(x_pos, y_pos, width, height, WHITE);
 }
+
+// void Paddle::DrawHitbox() {
+//     DrawRectangle(x_pos + width - 1, y_pos, 1, height, RED);
+// }
 
 void Paddle::UpdatePaddle() {
     if (IsKeyDown(KEY_A)) {

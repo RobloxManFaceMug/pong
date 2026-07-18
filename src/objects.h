@@ -27,7 +27,9 @@ class Paddle {
         int speed;
 
         void DrawPaddle();
+        void DrawHitbox();
         void UpdatePaddle();
+        void UpdateHitbox();
 
     protected:
         void StayInBounds();
