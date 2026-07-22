@@ -119,7 +119,7 @@ int MainMenu() {
     UnloadSound(snd_select);
     CloseAudioDevice();
 
-    WaitTime(0.25);
+    // WaitTime(0.25);
 
     // BeginDrawing();
     // ClearBackground(BLACK);
@@ -136,6 +136,49 @@ int MainMenu() {
     return 0;
 }
 
+void StartTimer() {
+
+    InitAudioDevice();
+    Sound snd_get_ready = LoadSound("resources/SFX/snd_get_ready.mp3");
+    Sound snd_game_start = LoadSound("resources/SFX/snd_game_start.wav");
+    int FrameCounter = 0;       // Amount of frames passed
+    bool PlayedAlready = 0;
+    const char *CurrentText = "3";      // Current displayed text
+    int FontSize = 800;
+    float WidthDivider = 4.0;
+    int WaitFrames = 45;        // Amount of frames before next number
+
+    PlaySound(snd_get_ready);
+    while(FrameCounter <= WaitFrames*4) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        // Displaying the text
+        DrawText(CurrentText, GetScreenWidth()/2 - FontSize/WidthDivider, GetScreenHeight()/2 - FontSize/2.25, FontSize, WHITE);
+
+        // Change text based on frames passed
+        if ((FrameCounter >= WaitFrames) && (FrameCounter < WaitFrames*2)) {
+            CurrentText = "2";
+        }
+        else if ((FrameCounter >= WaitFrames*2) && (FrameCounter < WaitFrames*3)) {
+            CurrentText = "1";
+        }
+        else if (FrameCounter >= WaitFrames*3) {
+           CurrentText = "GO";
+           WidthDivider = 1.55;
+            if (!PlayedAlready) {
+                PlaySound(snd_game_start);
+                PlayedAlready = 1;
+            }
+        }
+        EndDrawing();
+        FrameCounter++;
+    }
+    UnloadSound(snd_get_ready);
+    UnloadSound(snd_game_start);
+    CloseAudioDevice();
+}
+
 int main(void)
 {
 
@@ -150,6 +193,9 @@ int main(void)
     // Main menu, duh
     MainMenu();
 
+    // Timer before game start
+    StartTimer();
+
     // Initialize music
     InitAudioDevice();
     SetMasterVolume(MasterVolume);
@@ -161,14 +207,14 @@ int main(void)
     Sound snd_yourtakingtoolong = LoadSound("resources/SFX/snd_yourtakingtoolong.mp3");
     Sound snd_too_fast = LoadSound("resources/SFX/snd_too_fast.mp3");
     Music music;
-
-    switch (Difficulty) {
-        case 0:
-            music = LoadMusicStream("resources/music/Violet Tactics.mp3");
-            break;
-        default:
-            music = LoadMusicStream("resources/music/Catswing.mp3");
+    
+    if (Difficulty = 0) {
+        music = LoadMusicStream("resources/music/Violet Tactics.mp3");
     }
+    else {
+        music = LoadMusicStream("resources/music/Catswing.mp3");
+    }
+
     PlayMusicStream(music);
 
     // Objects initialization
@@ -292,17 +338,16 @@ int main(void)
             DrawText("P2 WINS", screenWidth/2 - 150*2, screenHeight/2 - 60, 150, WHITE);
             if (LongTimeCheckerFirstTimePlayer) {
                 // game over SFX based on difficulty
-                switch (Difficulty) {
-                    case 0:
-                        PauseMusicStream(music);
-                        PlaySound(snd_win_duel);
-                        LongTimeCheckerFirstTimePlayer = 0;
-                        break;
-                    default:
-                        PauseMusicStream(music);
-                        PlaySound(snd_defeat);
-                        LongTimeCheckerFirstTimePlayer = 0;
-                }
+                if (Difficulty = 0) {
+                    PauseMusicStream(music);
+                    PlaySound(snd_win_duel);
+                    LongTimeCheckerFirstTimePlayer = 0;
+                    }
+                else {
+                    PauseMusicStream(music);
+                    PlaySound(snd_defeat);
+                    LongTimeCheckerFirstTimePlayer = 0;
+                    }
             }
         }
 
